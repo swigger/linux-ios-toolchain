@@ -13,7 +13,7 @@ cctools.stamp:
 	cd ${CCTOOLS} && \
 		./autogen.sh; \
 		./configure --target=${TARGET} --prefix=${PREFIX} && \
-		make
+		make -j5
 	touch $@
 
 cctools-install.stamp: cctools.stamp
@@ -29,7 +29,7 @@ ios-tools.stamp:
 	cd ${IOSTOOLS} && \
 			./autogen.sh ; \
 			./configure --prefix=${PREFIX} && \
-			make
+			make -j5
 	touch $@
 
 ios-tools-install.stamp: ios-tools.stamp
