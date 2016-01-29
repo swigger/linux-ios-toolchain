@@ -74,6 +74,7 @@ int main(int argc, char **argv)
     version = read_sdkversion_from_configfile(config_file);
   }
 
+  vector<const char*> additional_args;
 
   // for SDK 4.x, set default arch to armv6
   if(beginWith(version,"4."))
@@ -91,6 +92,13 @@ int main(int argc, char **argv)
 #else
     command = clang + "++";
 #endif
+	for (int i=1; i<argc; ++i)
+	{
+		if (strncmp(argv[i], "-stdlib", 7)==0)
+			goto skipadd;
+	}
+	additional_args.push_back("-stdlib=libstdc++");
+skipadd:;
   }
 
   //look in argv, if -arch had been setted, just use the settings.
@@ -104,19 +112,22 @@ int main(int argc, char **argv)
   }
 
   // cmd args for execvpe;
-  char **cmd = (char **)malloc((8 + argc)*sizeof(char*));
-  cmd[0] = strdup(command.c_str());
-  cmd[1] = strdup("-target");
-  cmd[2] = strdup(target.c_str());
-  cmd[3] = strdup("-arch");
-  cmd[4] = strdup(default_arch.c_str());
-  cmd[5] = strdup("-isysroot");
-  cmd[6] = strdup(sdk_fullpath.c_str());
-  cmd[7] = strdup("-mlinker-version=134.9");
+  char **cmd = (char **)malloc((8 + argc + additional_args.size() + 10/*10 is a big enough value for avoiding memory overflow.*/)*sizeof(char*));
+  int pos = 0;
+  cmd[pos++] = strdup(command.c_str());
+  cmd[pos++] = strdup("-target");
+  cmd[pos++] = strdup(target.c_str());
+  cmd[pos++] = strdup("-arch");
+  cmd[pos++] = strdup(default_arch.c_str());
+  cmd[pos++] = strdup("-isysroot");
+  cmd[pos++] = strdup(sdk_fullpath.c_str());
+  cmd[pos++] = strdup("-mlinker-version=134.9");
+  for (size_t n=0; n<additional_args.size(); ++n)
+	  cmd[pos++] = strdup(additional_args[n]);
   for (int i = 1; i < argc; i ++) {
-    cmd[7+i] = argv[i];
+    cmd[pos++] = argv[i];
   }
-  cmd[7+argc] = (char *)0;
+  cmd[pos] = (char *)0;
 
   // env for execvpe
   int count = 0;
