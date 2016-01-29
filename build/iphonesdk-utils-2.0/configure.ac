@@ -4,6 +4,8 @@
 AC_PREREQ([2.68])
 AC_INIT(iphonesdk-utils, 2.0, [cjacker@gmail.com])
 
+AM_LDFLAGS=-g
+
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_SRCDIR(clangwrapper/clangwrapper.cpp)
 
@@ -53,9 +55,7 @@ AC_CHECK_LIB([m],[pow],[
 AC_SUBST(M_LIBS)
 
 
-PKG_CHECK_MODULES(XML, [
-    libxml-2.0 
-])
+PKG_CHECK_MODULES([XML], [ libxml-2.0 ])
 
 AC_CHECK_PROG(HAVE_LLVM_CONFIG, llvm-config, true, false)
 

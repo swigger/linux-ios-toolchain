@@ -8,9 +8,10 @@ ios_clang_wrapper_CPPFLAGS = 				\
 
 ios_clang_wrapper_LDADD =				\
 	$(top_builddir)/libhelper/libhelper.la \
-	$(top_builddir)/libplutil/libplutil.la
+	$(top_builddir)/libplutil/libplutil.la \
+	$(XML_LIBS)
 
 install-data-hook:
-	ln -sf ios-clang-wrapper $(DESTDIR)/$(bindir)/ios-clang
-	ln -sf ios-clang-wrapper $(DESTDIR)/$(bindir)/ios-clang++
-	ln -sf ios-clang-wrapper $(DESTDIR)/$(bindir)/ios-switchsdk
+	ln -sf ios-clang-wrapper $(DESTDIR)$(bindir)/ios-clang
+	ln -sf ios-clang-wrapper $(DESTDIR)$(bindir)/ios-clang++
+	ln -sf ios-clang-wrapper $(DESTDIR)$(bindir)/ios-switchsdk

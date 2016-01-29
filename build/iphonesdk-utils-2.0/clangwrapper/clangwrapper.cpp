@@ -10,8 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <libxml/parser.h> 
-#include <libxml/tree.h> 
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 
 #include "helper.h"
@@ -20,23 +20,29 @@ using namespace std;
 
 //default arch to armv7
 string default_arch = "armv7";
-//config file location 
+//config file location
 
 extern char ** environ;
 
 
 int main(int argc, char **argv)
 {
-
   string config_file = string(getenv("HOME")) + "/.iphonesdk";
 
   // (1) detect toolchain.
   string clang = find_command("clang","clang","clang");
   string ldid = find_command("ldid","ldid","ldid");
   string as = find_command("arm-apple-darwin9-as","arm-apple","as");
-  string target = as.substr(as.find("arm"), as.length()-3-as.find("arm"));
+  string target = as.substr(as.find("arm"));
+  //porting to msys2
+#if defined(__CYGWIN__) || defined(__CYGWIN64__)
+  if (target.length()>4 && strcasecmp(target.c_str()+target.length()-4, ".exe")==0)
+  {
+	  target.resize(target.length()-4);
+  }
+#endif
+  target.resize(target.length()-3);
 
-  
   if(clang.empty() || ldid.empty() || as.empty()) {
     cout <<"Can not find proper toolchain commands."<<endl;
     cout <<"You may need install clang, ldid, cctools" <<endl;
@@ -54,7 +60,7 @@ int main(int argc, char **argv)
 
   if(endWith(string(argv[0]),"ios-switchsdk"))
     should_init = 1;
-  //if ~/.iphonesdk not exists, detect it.  
+  //if ~/.iphonesdk not exists, detect it.
   if(::access(config_file.c_str(),R_OK) != 0 || should_init)
     detect_sdk_and_write_configfile(config_file);
 
@@ -72,14 +78,21 @@ int main(int argc, char **argv)
   // for SDK 4.x, set default arch to armv6
   if(beginWith(version,"4."))
        default_arch = "armv6";
-    
+
   string command = "clang";
   string caller = argv[0];
   if(endWith(caller,"ios-clang"))
     command = clang;
   else if(endWith(caller,"ios-clang++"))
+  {
+#if defined(__CYGWIN__) || defined(__CYGWIN64__)
+	  command = clang.substr(0, clang.length()-4);
+	  command += "++.exe";
+#else
     command = clang + "++";
- 
+#endif
+  }
+
   //look in argv, if -arch had been setted, just use the settings.
   for(int i = 0; i < argc; i++) {
     if(strcmp(argv[i],"-arch") == 0 && (i+1) < argc) {
@@ -88,8 +101,8 @@ int main(int argc, char **argv)
             default_arch = arch;
         break;
     }
-  } 
-     
+  }
+
   // cmd args for execvpe;
   char **cmd = (char **)malloc((8 + argc)*sizeof(char*));
   cmd[0] = strdup(command.c_str());

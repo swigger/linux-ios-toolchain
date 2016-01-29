@@ -54,15 +54,19 @@ string find_cmd_in_dir(string dir, string begin, string end)
 
 string find_command(string cmd, string begin, string end)
 {
-    string cmd_fullpath; 
-    
+    string cmd_fullpath;
+#if defined(__CYGWIN__) || defined(__CYGWIN64__)
+	cmd += ".exe";
+	end += ".exe";
+#endif
+
     vector<string> pathdir = fillpath();
     for(int i = 0 ; i < pathdir.size(); i++) {
         string cmd_fullpath = pathdir[i] + "/" + cmd;
         if(access(cmd_fullpath.c_str(), X_OK) == 0)
             return cmd_fullpath;
     }
-   
+
     for(int i = 0 ; i < pathdir.size(); i++) {
         cmd_fullpath = find_cmd_in_dir(pathdir[i], begin, end);
         if(!cmd_fullpath.empty())
@@ -116,22 +120,22 @@ string find_more_dirs_in_dir(string dir, string begin, string end)
   struct dirent *entry;
   if((dirptr = opendir(dir.c_str()))==NULL)
       return "";
-  
+
   while((entry=readdir(dirptr))) {
     string filename = entry->d_name;
-    if(endWith(filename,end) && beginWith(filename, begin)) 
+    if(endWith(filename,end) && beginWith(filename, begin))
       dirs.push_back(filename);
   }
-  closedir(dirptr);  
+  closedir(dirptr);
 
   if(dirs.size() == 0) //notfound;
     return "";
-  
+
   if(dirs.size() == 1)
     return dirs[0];
-  
+
   printf("There are more than one sdks found:\n");
-  for(int i = 0; i < dirs.size(); i++) 
+  for(int i = 0; i < dirs.size(); i++)
     printf("[%i] %s\n", i, dirs[i].c_str());
   short input;
   do {
@@ -142,5 +146,5 @@ string find_more_dirs_in_dir(string dir, string begin, string end)
         cin.sync();
       }
   } while(input > dirs.size() || input < 0);
-  return dirs[input]; 
+  return dirs[input];
 }
