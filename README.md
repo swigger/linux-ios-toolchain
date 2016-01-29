@@ -20,7 +20,7 @@ Yes. `:D`
 An effort is being made to make the project compilation as painless as possible. If you're on Ubuntu 13.10, you should be able to compile running the following commands:
 
 ```bash
-git clone --recursive https://github.com/waneck/linux-ios-toolchain.git
+git clone --recursive https://github.com/swigger/linux-ios-toolchain.git
 cd linux-ios-toolchain
 sudo apt-get install gcc g++ clang libclang-dev uuid-dev libssl-dev libpng12-dev libicu-dev bison flex libsqlite3-dev libtool llvm-dev libxml2-dev automake pkg-config
 make
@@ -29,5 +29,6 @@ sudo make install
 
 Users from other distributions are encouraged to share/submit an issue so we can get it to work with their setup.
 
-## How to hxcpp/haxe
-SOON
+##  what does this fork do?
+Porting to msys2-x64 on windows7-x64.
+Tested on clang-3.8 with ios SDK 9.1.
